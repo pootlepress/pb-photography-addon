@@ -1,0 +1,77 @@
+img.ppbx-photo-ken-burns {
+    position: absolute;
+    top: -999px;
+    bottom: -999px;
+    left: -999px;
+    right: -999px;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    overflow: hidden;
+    margin: auto;
+    object-fit: cover;
+}
+
+@-ms-keyframes ppbx-photo-ken-burns {
+    from {
+        -ms-transform: translateX(-25px);
+    }
+    to {
+        -ms-transform: translateX(25px);
+    }
+}
+
+@-o-keyframes ppbx-photo-ken-burns {
+    from {
+        -o-transform: translateX(-25px);
+    }
+    to {
+        -o-transform: translateX(25px);
+    }
+}
+
+@-moz-keyframes ppbx-photo-ken-burns {
+    from {
+        -moz-transform: translateX(-25px);
+    }
+    to {
+        -moz-transform: translateX(25px);
+    }
+}
+
+@-webkit-keyframes ppbx-photo-ken-burns {
+    from {
+        -webkit-transform: translateX(-25px);
+    }
+    to {
+        -webkit-transform: translateX(25px);
+    }
+}
+
+@keyframes ppbx-photo-ken-burns {
+    from {
+        transform: translateX(-25px);
+    }
+    to {
+        transform: translateX(25px);
+    }
+}
+
+img.ppbx-photo-ken-b {
+    display: none;
+}
+
+img.ppbx-photo-ken-burns2 {
+    opacity: 0;
+}
+
+img.ppbx-photo-ken-burns.ppbx-photo-ken-b {
+    display: block;
+    -ms-animation: ppbx-photo-ken-burns 8s linear 0s infinite alternate;
+    -o-animation: ppbx-photo-ken-burns 8s linear 0s infinite alternate;
+    -moz-animation: ppbx-photo-ken-burns 8s linear 0s infinite alternate;
+    -webkit-animation: ppbx-photo-ken-burns 8s linear 0s infinite alternate;
+    animation: ppbx-photo-ken-burns 8s linear 0s infinite alternate;
+    max-width: none;
+}
