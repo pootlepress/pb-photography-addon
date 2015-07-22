@@ -1,4 +1,11 @@
 /**
+ * Plugin front end scripts
+ *
+ * @package pootle_page_builder_for_photography
+ * @version 0.1.0
+ */
+
+/**
  * Created by shramee on 16/6/15.
  */
 jQuery(function ($) {
@@ -110,4 +117,3 @@ jQuery(function ($) {
 
     });
 });
-
