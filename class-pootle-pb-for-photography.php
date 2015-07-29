@@ -115,14 +115,14 @@ class pootle_page_builder_for_photography{
 			'name' => __( 'Ken Burns effect', 'vantage' ),
 			'type' => 'checkbox',
 			'tab' => 'background',
-			'priority' => 3,
+			'priority' => 6,
 		);
 
 		$fields['ken_burns_img2'] = array(
 			'name' => __( 'Second BG Image', 'vantage' ),
 			'type' => 'upload',
 			'tab' => 'background',
-			'priority' => 3,
+			'priority' => 6,
 		);
 
 		return $fields;
