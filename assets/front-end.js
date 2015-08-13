@@ -2,7 +2,7 @@
  * Plugin front end scripts
  *
  * @package pootle_page_builder_for_photography
- * @version 0.1.0
+ * @version 1.0.0
  */
 
 /**
