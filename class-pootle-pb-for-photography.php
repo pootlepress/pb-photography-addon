@@ -130,10 +130,16 @@ class pootle_page_builder_for_photography{
 		//Instantiating admin class
 		$this->admin = pootle_page_builder_for_photography_Admin::instance();
 
+		//Adding admin scripts
+		add_action( 'pootlepb_enqueue_admin_scripts', array( $this->admin, 'enqueue' ) );
+		//Adding html to metabox
+		add_action( 'pootlepb_metabox_end', array( $this->admin, 'dialog' ) );
 		//Row settings panel fields
-		add_filter( 'pootlepb_row_settings_fields', array( $this->admin, 'row_settings_fields' ) );
+		add_filter( 'pootlepb_row_settings_fields', array( $this->admin, 'row_settings_fields' ), 1, 25 );
+		//Row custom fields
+		add_action( "pootlepb_row_settings_custom_field_photo-filter", array( $this->admin, 'row_photo_filter_field' ), 1, 25 );
 		//Content block panel fields
-		add_filter( 'pootlepb_content_block_fields', array( $this->admin, 'content_block_fields' ) );
+		add_filter( 'pootlepb_content_block_fields', array( $this->admin, 'content_block_fields' ), 1, 25 );
 
 	}
 
