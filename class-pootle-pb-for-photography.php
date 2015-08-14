@@ -155,9 +155,6 @@ class pootle_page_builder_for_photography{
 		add_action( 'wp_enqueue_scripts', array( $this->public, 'enqueue' ) );
 		//Add/Modify row html attributes
 		add_filter( 'pootlepb_row_style_attributes', array( $this->public, 'row_attr' ), 10, 2 );
-		//Add/Modify content block html attributes
-		add_filter( 'pootlepb_content_block_attributes', array( $this->public, 'content_block_attr' ), 10, 2 );
-
 	} // End enqueue()
 
 	/**
