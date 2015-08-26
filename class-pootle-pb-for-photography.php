@@ -114,11 +114,6 @@ class pootle_page_builder_for_photography{
 
 			//Mark this add on as active
 			add_filter( 'pootlepb_installed_add_ons', array( $this, 'add_on_active' ) );
-
-			/** Including PootlePress_API_Manager class */
-			require_once( plugin_dir_path( __FILE__ ) . 'pp-api/class-pp-api-manager.php' );
-			/** Instantiating PootlePress_API_Manager */
-			new PootlePress_API_Manager( self::$token, 'pootle page builder for photography', self::$version, __FILE__, self::$token );
 		}
 	} // End init()
 
