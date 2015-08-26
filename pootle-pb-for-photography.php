@@ -20,7 +20,7 @@ pootle_page_builder_for_photography::instance( __FILE__ );
 /** Instantiating PootlePress_API_Manager */
 new PootlePress_API_Manager(
 	pootle_page_builder_for_photography::$token,
-	'pootle page builder for WooCommerce',
+	'pootle page builder for photography',
 	pootle_page_builder_for_photography::$version,
 	pootle_page_builder_for_photography::$file,
 	pootle_page_builder_for_photography::$token
