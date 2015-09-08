@@ -57,3 +57,58 @@ canvas.ppb-photo-canvas-main {
     max-width: 100%;
     height: auto;
 }
+
+@-webkit-keyframes rotate {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes rotate {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+.ppb-photo-in-progress {
+    background: rgba(0,0,0,0.5);
+}
+
+.ppb-photo-in-progress, .ppb-photo-in-progress .hv-center {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.ppb-photo-render {
+    height: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+.ppb-photo-in-progress .hv-center .dashicons {
+    display:block;
+    -webkit-animation: rotate 2s infinite linear;
+    animation: rotate 2s infinite linear;
+    font-size: 70px;
+    height: auto;
+    width: auto;
+    margin:0 0 25px;
+}
+
+.ppb-photo-in-progress .hv-center {
+    color: #fff;
+    font-size: 30px;
+    height: 140px;
+    width: 250px;
+    text-align: center;
+    margin: auto;
+}

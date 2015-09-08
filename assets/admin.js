@@ -8,10 +8,6 @@ jQuery( function ( $ ) {
 	ppbPhoto = {};
 	ppbPhoto.dlog = $( '#photo-filter-dialog' );
 
-	$( 'ppb-photo-canvas' ).click( function () {
-
-	} );
-
 	ppbPhoto.dlog.ppbDialog( {
 		dialogClass : 'image-filter-dialog ppb-cool-panel-container',
 		autoOpen : false,
@@ -21,9 +17,11 @@ jQuery( function ( $ ) {
 		height : $( window ).height() - 50,
 		width : $( window ).width() - 50,
 		open : function () {
+			ppbPhoto.dlog.find( '.ppb-photo-in-progress span.message' ).html('Loading...');
+
 			var data = ppbPhoto.photoData,
 				url = data.thumb;
-			console.log(ppbPhoto.photoData)
+			console.log(ppbPhoto.photoData);
 
 			//Refreshing caman canvas
 			$( '.ppb-photo-canvas, .ppb-photo-canvas-main' ).removeAttr( "data-caman-id" );
@@ -86,44 +84,66 @@ jQuery( function ( $ ) {
 				this.hemingway().render();
 			} );
 
+			$( '.ppb-photo-control' ).val( '0' );
 			Caman( '#ppb-photo-canvas-main', data.medium, function () {
 				window.ppbPhotoCamanThis = this;
 				if ( typeof this[data.filter] == 'function' ) {
 					this[data.filter]();
 				}
-				$.each( data.filterControls, function ( k, v ) {
-					var $f = $( '.ppb-photo-control-' + k );
-					if ( $f.length ) {
-						$f.val( v );
-						window.ppbPhotoCamanThis[k]( v );
-						window.ppbPhotoCamanThis['render']();
-					}
-				} );
+				if ( data.filterControls ) {
+					$.each( data.filterControls, function ( k, v ) {
+						var $f = $( '.ppb-photo-control-' + v[0] );
+						if ( $f.length ) {
+							$f.val( v[1] );
+							window.ppbPhotoCamanThis[v[0]]( v[1] );
+							if ( k + 1 == data.filterControls.length ) {
+								window.ppbPhotoCamanThis.render( function () {
+									$( '.ppb-photo-in-progress' ).hide();
+								} );
+							}
+						}
+					} );
+				} else {
+					setTimeout( function(){$( '.ppb-photo-in-progress' ).hide();}, 1600 );
+				}
 			} );
 		},
 		close : function () {
 		},
 		buttons : {
-			Ok : function () {
-				ppbPhoto.field.val( JSON.stringify( ppbPhoto.photoData ) );
-				ppbPhoto.dlog.ppbDialog( 'close' );
+			Render : function () {
+				ppbPhoto.dlog.find( '.ppb-photo-in-progress span.message' ).html('Rendering...');
+				$( '.ppb-photo-in-progress' ).show();
+				var interval;
+				$( '.ppb-photo-render' ).append( $('<img id="ppb-photo-main-render" data-caman="' + ppbPhoto.photoData.filters + '" src="' + ppbPhoto.photoData.full + '">') );
+
+				interval = setInterval(function(){
+					var $img = $( '.ppb-photo-render img' );
+					if ( $img.length && ! $img.attr( 'data-caman' ) ) {
+						ppbPhoto.photoData.image = $img.attr( 'src' );
+						ppbPhoto.field.val( JSON.stringify( ppbPhoto.photoData ) );
+						ppbPhoto.dlog.ppbDialog( 'close' );
+						clearInterval( interval );
+					}
+				}, 500);
+
+				Caman.DOMUpdated();
 			}
 		}
 	} );
 
 	$( '.ppb-photo-canvas' ).click( function () {
 		var $t = $( this ),
-			filter = $t.data( 'filter' ),
-			url = ppbPhoto.photoData.thumb;
+			filter = $t.data( 'filter' );
 		//Resetting old data
-		ppbPhoto.photoData.filterControls = {};
+		ppbPhoto.photoData.filterControls = [];
 		ppbPhoto.photoData.filters = '';
 		ppbPhoto.photoData.filter = '';
 		$.each( filter_controls.filters, function ( k ) {
 			$( '.ppb-photo-control-' + k ).val( '0' );
 		} );
 
-		//Rendering current filter
+		//Rendering current filters
 		Caman( '#ppb-photo-canvas-main', function () {
 			this.revert( false );
 			if ( typeof this[filter] == 'function' ) {
@@ -139,33 +159,37 @@ jQuery( function ( $ ) {
 		var filter = ppbPhoto.photoData.filter,
 			i = 0;
 		Caman( '#ppb-photo-canvas-main', function () {
-
+			var filters = '';
 			this.revert( false );
 			if ( typeof this[filter] == 'function' ) {
 				this[filter]();
 			}
-
+			ppbPhoto.photoData.filterControls = [];
 			window.ppbPhotoCamanThis = this;
 			$.each( filter_controls.filters, function ( k ) {
 				var $f = $( '.ppb-photo-control-' + k );
 				if ( typeof window.ppbPhotoCamanThis[k] == 'function' && 0 != parseInt( $f.val() ) ) {
 					window.ppbPhotoCamanThis[k]( parseInt( $f.val() ) );
-					ppbPhoto.photoData.filters += ' ' + k + '(' + $f.val() + ')';
-					ppbPhoto.photoData.filterControls[ k ] = $f.val();
+					filters += ' ' + k + '(' + $f.val() + ')';
+					ppbPhoto.photoData.filterControls.push( [ k, $f.val() ] );
 				}
 				i++;
 				if ( i == filter_controls.number ) {
 					window.ppbPhotoCamanThis.render();
 				}
 			} );
-			//this.render()
+			ppbPhoto.photoData.filters = ppbPhoto.photoData.filter + '()' + filters;
 		} );
 	} );
 
 	$( 'html' ).on( 'pootlepb_admin_input_field_event_handlers', function ( e, $this ) {
 		$this.find( '.filter-button' ).click( function () {
 			ppbPhoto.field = $( this ).siblings( 'input' );
-			ppbPhoto.photoData = JSON.parse( ppbPhoto.field.val() );
+			var fieldJSON = ppbPhoto.field.val();
+			ppbPhoto.photoData = {};
+			if ( fieldJSON ) {
+				ppbPhoto.photoData = JSON.parse( fieldJSON );
+			}
 			ppbPhoto.dlog.ppbDialog( 'open' );
 		} );
 
@@ -173,7 +197,11 @@ jQuery( function ( $ ) {
 
 		$this.find( '.ppb-photo-button' ).on( 'click', function ( event ) {
 			ppbPhoto.field = $( this ).siblings( 'input' );
-			ppbPhoto.photoData = JSON.parse( ppbPhoto.field.val() );
+			var fieldJSON = ppbPhoto.field.val();
+			ppbPhoto.photoData = {};
+			if ( fieldJSON ) {
+				ppbPhoto.photoData = JSON.parse( fieldJSON );
+			}
 
 			event.preventDefault();
 
@@ -204,7 +232,6 @@ jQuery( function ( $ ) {
 
 				//Updating field
 				$field.val( JSON.stringify( ppbPhoto.photoData ) );
-				console.log(ppbPhoto.photoData);
 				$field.change();
 
 			} );

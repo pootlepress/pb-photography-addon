@@ -281,6 +281,13 @@ class pootle_page_builder_for_photography_Admin{
 						<canvas class="ppb-photo-canvas" data-filter="hemingway" id="ppb-photo-canvas-18"></canvas><br>
 						<center>hemingway</center><br>
 					</div>
+					<div class="ppb-photo-render"></div>
+					<div class="ppb-photo-in-progress">
+						<div class="hv-center">
+							<span class="dashicons dashicons-update"></span>
+							<span class="message">Rendering...</span>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -52,6 +52,7 @@ class pootle_page_builder_for_photography_Public{
 
 		wp_enqueue_style( $token . '-css', $url . '/assets/front-end.css' );
 		wp_enqueue_script( $token . '-js', $url . '/assets/front-end.js', array( 'jquery' ) );
+		wp_enqueue_script( $token . 'caman-js', '//cdnjs.cloudflare.com/ajax/libs/camanjs/4.1.2/caman.full.min.js', array( 'jquery' ) );
 	}
 
 	/**
@@ -70,6 +71,20 @@ class pootle_page_builder_for_photography_Public{
 			$attr['data-ken-burns-img2'][] = $settings['ken_burns_img2'];
 		}
 
+		$this->row_bg( $attr, $settings );
 		return $attr;
+	}
+
+	/**
+	 * Adds or modifies the row attributes
+	 * @param array $attr Row html attributes
+	 * @param array $settings Row settings
+	 * @since 1.0.0
+	 */
+	public function row_bg( &$attr, $settings ) {
+		if ( ! empty( $settings['photo_background_image'] ) ) {
+			$set = json_decode( $settings['photo_background_image'] );
+			$attr['style'] .= "background:url({$set->image}) center/{$settings['background_image_size']};";
+		}
 	}
 }
