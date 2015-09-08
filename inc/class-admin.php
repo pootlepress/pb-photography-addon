@@ -15,6 +15,8 @@ class pootle_page_builder_for_photography_Admin{
 	 */
 	private static $_instance = null;
 
+	protected $filters;
+
 	/**
 	 * Main pootle page builder for photography Instance
 	 * Ensures only one instance of Storefront_Extension_Boilerplate is loaded or can be loaded.
@@ -49,9 +51,35 @@ class pootle_page_builder_for_photography_Admin{
 		$token = $this->token;
 		$url = $this->url;
 
+		$this->filters = array(
+			array(
+				'brightness' => 'Brightness',
+				'contrast' => 'Contrast',
+				'saturation' => 'Saturation',
+				'vibrance' => 'Vibrance',
+				'exposure' => 'Exposure',
+			),
+			array(
+				'hue' => 'Hue',
+				'sepia' => 'Sepia',
+				'gamma' => 'Gamma',
+				'noise' => 'Noise',
+				'clip' => 'Clip',
+				'sharpen' => 'Sharpen',
+				'stackBlur' => 'Blur',
+			)
+		);
+
+		$filters = array_merge( $this->filters[0], $this->filters[1] );
+
 		wp_enqueue_style( $token . 'admin-css', $url . 'assets/admin.css' );
 		wp_enqueue_script( $token . 'admin-js', $url . 'assets/admin.js', array( 'jquery' ) );
-		wp_enqueue_script( $token . 'caman-js', '//cdnjs.cloudflare.com/ajax/libs/camanjs/4.0.0/caman.full.pack.js', array( 'jquery' ) );
+		wp_enqueue_script( $token . 'caman-js', '//cdnjs.cloudflare.com/ajax/libs/camanjs/4.1.2/caman.full.min.js', array( 'jquery' ) );
+
+		wp_localize_script( $token . 'admin-js', 'filter_controls', array(
+			'number'  => count( $filters ),
+		    'filters' => $filters,
+		) );
 	}
 
 	/**
@@ -63,7 +91,13 @@ class pootle_page_builder_for_photography_Admin{
 	 */
 	public function row_settings_fields( $fields ) {
 
-		$fields['background_image']['type'] = 'photo-filter';
+		unset( $fields['background_image'] );
+		$fields['photo_background_image'] = array(
+			'name' => __( 'Background Image', 'vantage' ),
+			'tab' => 'background',
+			'type' => 'photo-filter',
+			'priority' => 5,
+		);
 
 		$fields['ken_burns'] = array(
 			'name' => __( 'Ken Burns effect', 'vantage' ),
@@ -90,17 +124,13 @@ class pootle_page_builder_for_photography_Admin{
 	 */
 	public function row_photo_filter_field( $key, $field ) {
 		?>
-		<input style=" width: 50px;" type="text" id="pp-pb-<?php esc_attr_e( $key ) ?>"
+		<input style=" width: 50px;" id="pp-pb-<?php esc_attr_e( $key ) ?>"
+		       type="hidden" class="image-data"
 		       name="panelsStyle[<?php echo esc_attr( $key ) ?>]"
 		       data-style-field="<?php echo esc_attr( $key ) ?>"
 		       data-style-field-type="<?php echo esc_attr( $field['type'] ) ?>"
 			/>
-		<input type="hidden" id="pp-pb-<?php esc_attr_e( $key . '_filters' ) ?>"
-		       name="panelsStyle[<?php echo esc_attr( $key . '_filters' ) ?>]"
-		       data-style-field="<?php echo esc_attr( $key . '_filters' ) ?>"
-		       data-style-field-type="<?php echo esc_attr( $field['type'] ) ?>"
-			/>
-		<button class="button upload-button">Select Image</button>
+		<button class="button ppb-photo-button">Select Image</button>
 		<button class="button filter-button">Filter Image</button>
 		<?php
 	}
@@ -140,35 +170,117 @@ class pootle_page_builder_for_photography_Admin{
 		     class="panels-admin-dialog">
 			<div class="ppb-cool-panel-wrap">
 				<div class="ppb-photo-sidebar">
-
+					<canvas class="ppb-photo-canvas-main" data-filter="" id="ppb-photo-canvas-main"></canvas>
+					<div class="controls">
+						<?php
+						foreach ( $this->filters[0] as $filter => $name ) {
+							?>
+							<div class="control">
+								<label for="<?php echo $filter; ?>"><?php echo $name; ?></label>
+								<input class="ppb-photo-control ppb-photo-control-<?php echo $filter; ?>"
+								       data-filter="<?php echo $filter; ?>" name="<?php echo $filter; ?>"
+								       type="range" min="-100" max="100" value="0">
+							</div>
+							<?php
+						}
+						foreach ( $this->filters[1] as $filter => $name ) {
+							?>
+							<div class="control">
+								<label for="<?php echo $filter; ?>"><?php echo $name; ?></label>
+								<input class="ppb-photo-control ppb-photo-control-<?php echo $filter; ?>"
+								       data-filter="<?php echo $filter; ?>" name="<?php echo $filter; ?>"
+								       type="range" min="0" max="<?php
+								if ( 'gamma' == $filter ) {
+									echo 10;
+								} else if ( 'stackBlur' == $filter ) {
+									echo 20;
+								} else {
+									echo 100;
+								}
+								?>" value="0">
+							</div>
+							<?php
+						}
+						?>
+					</div>
 				</div>
 				<div class="ppb-photo-content">
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-0"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-1"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-2"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-3"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-4"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-5"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-6"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-7"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-8"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-9"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-10"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-11"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-12"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-13"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-14"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-15"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-16"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-17"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-18"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-19"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-20"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-21"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-22"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-23"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-24"></canvas>
-					<canvas class="ppb-photo-canvas" id="ppb-photo-canvas-25"></canvas>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="" id="ppb-photo-canvas-0"></canvas>
+						<center>Default</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="vintage" id="ppb-photo-canvas-1"></canvas><br>
+						<center>vintage</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="lomo" id="ppb-photo-canvas-2"></canvas><br>
+						<center>lomo</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="emboss" id="ppb-photo-canvas-3"></canvas><br>
+						<center>emboss</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="radialBlur" id="ppb-photo-canvas-4"></canvas><br>
+						<center>nostalgia</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="clarity" id="ppb-photo-canvas-5"></canvas><br>
+						<center>clarity</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="orangePeel" id="ppb-photo-canvas-6"></canvas><br>
+						<center>orangePeel</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="sinCity" id="ppb-photo-canvas-7"></canvas><br>
+						<center>sinCity</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="sunrise" id="ppb-photo-canvas-8"></canvas><br>
+						<center>sunrise</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="crossProcess" id="ppb-photo-canvas-9"></canvas><br>
+						<center>crossProcess</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="love" id="ppb-photo-canvas-10"></canvas><br>
+						<center>love</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="grungy" id="ppb-photo-canvas-11"></canvas><br>
+						<center>grungy</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="jarques" id="ppb-photo-canvas-12"></canvas><br>
+						<center>jarques</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="pinhole" id="ppb-photo-canvas-13"></canvas><br>
+						<center>pinhole</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="oldBoot" id="ppb-photo-canvas-14"></canvas><br>
+						<center>oldBoot</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="glowingSun" id="ppb-photo-canvas-15"></canvas><br>
+						<center>glowingSun</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="hazyDays" id="ppb-photo-canvas-16"></canvas><br>
+						<center>hazyDays</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="herMajesty" id="ppb-photo-canvas-17"></canvas><br>
+						<center>herMajesty</center><br>
+					</div>
+					<div style="display: inline-block;">
+						<canvas class="ppb-photo-canvas" data-filter="hemingway" id="ppb-photo-canvas-18"></canvas><br>
+						<center>hemingway</center><br>
+					</div>
 				</div>
 			</div>
 		</div>

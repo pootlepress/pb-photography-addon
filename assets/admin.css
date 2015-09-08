@@ -1,17 +1,18 @@
 .image-filter-dialog .ppb-photo-content{
     height:100%;
-    margin-right: 200px;
-    padding: 20px;
+    margin-right: 330px;
+    padding: 12px;
     overflow: auto;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
+
 .image-filter-dialog .ppb-photo-sidebar{
-    width: 200px;
+    width: 300px;
     display: block;
     position: absolute;
-    padding: 20px;
+    padding: 12px 15px;
     background: #f3f3f3;
     border-right: 1px solid #ccc;
     left: initial;
@@ -20,7 +21,24 @@
     bottom: 0;
     border: none;
     border-left: 1px solid #ccc;
+    overflow: auto;
 }
+
+.ppb-photo-sidebar .control > * {
+    display: inline-block;
+    vertical-align: middle;
+    width: 140px;
+}
+
+.ppb-photo-sidebar .control {
+    padding-top: 16px;
+}
+
+.ppb-photo-sidebar .control > label {
+    width: 120px;
+    padding-left: 5px;
+}
+
 .ppb-cool-panel-container.image-filter-dialog .ppb-dialog-titlebar, .ppb-cool-panel-container.image-filter-dialog .ppb-dialog-buttonpane{
     margin-right: 0;
     margin-left: 0;
@@ -32,6 +50,10 @@
 }
 
 canvas.ppb-photo-canvas {
-    width: 160px !important;
-    height: auto !important;
+    cursor: pointer;
+}
+
+canvas.ppb-photo-canvas-main {
+    max-width: 100%;
+    height: auto;
 }
